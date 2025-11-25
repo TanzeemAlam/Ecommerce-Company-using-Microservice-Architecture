@@ -1,0 +1,17 @@
+package com.tanzeem.product_detail_service.service;
+
+import java.util.List;
+
+import com.tanzeem.product_detail_service.entity.ProductDetail;
+
+public interface ProductDetailService {
+	public ProductDetail addProduct(ProductDetail p);
+
+	public List<ProductDetail> getAllProductDetails();
+
+	public ProductDetail getProductDetail(Long id);
+	
+	public String updateProductDetail(Long id, ProductDetail updatedProduct);
+
+	public String deleteProductDetail(Long id);
+}
