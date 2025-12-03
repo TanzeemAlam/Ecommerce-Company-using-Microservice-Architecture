@@ -1,31 +1,16 @@
 package com.tanzeem.user_service.controller;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
-import com.tanzeem.user_service.dto.AuthRequestDto;
-import com.tanzeem.user_service.dto.UserRequestDto;
+import com.tanzeem.user_service.dto.*;
 import com.tanzeem.user_service.entity.User;
 import com.tanzeem.user_service.event.RegistrationEvent;
-import com.tanzeem.user_service.util.JwtUtil;
-import com.tanzeem.user_service.repository.UserRepository;
-import com.tanzeem.user_service.service.CustomUserDetailService;
-import com.tanzeem.user_service.service.UserService;
-import com.tanzeem.user_service.util.ApiResponse;
-import com.tanzeem.user_service.util.AppConstants;
+import com.tanzeem.user_service.service.*;
+import com.tanzeem.user_service.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -44,13 +29,7 @@ public class UserController {
 	private UserService userService;
 	
 	@Autowired
-	private JwtUtil jwtUtil;
-	
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
-	@Autowired
-	private CustomUserDetailService customUserDetailService;
+	private AuthService authService;
 	
 	@Value("${custom.message}")
 	private String customMessage;
@@ -74,11 +53,9 @@ public class UserController {
 		String jwtToken = null;
 		
 		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
+			authService.authenticate(dto.getUsername(), dto.getPassword());
 			
-			UserDetails userDetails = customUserDetailService.loadUserByUsername(dto.getUsername());
-			
-			jwtToken = jwtUtil.generateToken(userDetails.getUsername(), userDetails.getAuthorities());
+			jwtToken = authService.generateToken(dto.getUsername());
 			
 			return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(AppConstants.JWT_TOKEN + jwtToken));
 		}
@@ -98,7 +75,7 @@ public class UserController {
 	
 	@GetMapping("/validateToken")
 	public ResponseEntity<ApiResponse> validateToken(@RequestParam String token) {
-		if (jwtUtil.validateToken(token))
+		if (authService.validateJwtToken(token))
 			return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponse(AppConstants.VALID_TOKEN));
 		
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(AppConstants.INVALID_TOKEN));

@@ -27,9 +27,6 @@ public class ProductDetailController {
 	@Autowired
 	private ProductDetailService productDetailService;
 	
-	@Autowired
-	private ProductClient productClient;
-	
 	@Value("${custom.message}")
 	private String customMessage;
 	
@@ -40,7 +37,7 @@ public class ProductDetailController {
 	
 	@PostMapping
 	public ResponseEntity<ApiResponse> addProductDetail(@Valid @RequestBody ProductDetailRequestDto dto, @RequestHeader("Authorization") String authHeader) {
-		if (productClient.validateProduct(dto.getProductId(), authHeader)) {
+		if (productDetailService.validateProduct(dto.getProductId(), authHeader)) {
 			productDetailService.addProduct(convertToEntity(dto));
 			
 			return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(AppConstants.PRODUCT_DETAIL_CREATED));
@@ -62,11 +59,6 @@ public class ProductDetailController {
 			return ResponseEntity.status(HttpStatus.OK).body(convertToDto(productDetail));
 		else 
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(AppConstants.NOT_FOUND));
-	}
-	
-	@GetMapping("/{id}/product")
-	public ProductDetailResponseDto getProductWithProductDetail(@PathVariable Long id) {
-		return  convertToDto(productDetailService.getProductDetail(id));
 	}
 	
 	@PutMapping("/{id}")

@@ -1,3 +1,6 @@
+server:
+  port: 8888
+
 spring:
   application:
     name: config-server
@@ -7,11 +10,11 @@ spring:
       server:
         git:
           uri: https://github.com/TanzeemAlam/ecommerce-application-config-repo
-server:
-  port: 8888
 
 eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://172.27.64.1:8761/eureka/
   instance:
-    client:
-      serverUrl:
-        defaultZone: http://localhost:8761/eureka/
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}

@@ -4,11 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.tanzeem.product_detail_service.dto.ProductDetailResponseDto;
 import com.tanzeem.product_detail_service.entity.ProductDetail;
 import com.tanzeem.product_detail_service.repository.ProductDetailRepository;
 import com.tanzeem.product_detail_service.service.ProductClient;
@@ -20,6 +17,9 @@ public class ProductDetailServiceImpl implements ProductDetailService{
 
 	@Autowired
 	private ProductDetailRepository productDetailRepository;
+	
+	@Autowired
+	private ProductClient productClient;
 	
 	@Override
 	public ProductDetail addProduct(ProductDetail p) {
@@ -69,5 +69,9 @@ public class ProductDetailServiceImpl implements ProductDetailService{
 		
 		return AppConstants.NOT_FOUND;
 	}
-
+	
+	@Override
+	public Boolean validateProduct(Long id, String token) {
+		return productClient.validateProduct(id, token);
+	}
 }

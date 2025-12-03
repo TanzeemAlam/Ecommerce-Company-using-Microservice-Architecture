@@ -1,5 +1,7 @@
 package com.tanzeem.api_gateway.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.*;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -15,6 +17,8 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
+	public static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
+	
 	@Autowired
 	private RouteValidator validator;
 	
@@ -28,9 +32,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 	
 	@Override
 	public GatewayFilter apply(Config config) {
+		
 		return ((exchange, chain) -> {
 			
 			if (validator.isSecured.test(exchange.getRequest())) {
+				
+				logger.info("Validating JWT token.....");
 				
 				//Check if Header contains JWT token or not
 				if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
@@ -51,6 +58,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 						.flatMap(response -> handleResponse(response, exchange, chain))
 						.onErrorResume(e -> handleError(exchange));
 			}
+			else	logger.info("Open request! No JWT required...");
 			
 			return chain.filter(exchange);
 		});
@@ -73,6 +81,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 	 * Handling error got from web client
 	 */
     private Mono<Void> handleError(ServerWebExchange exchange) {
+    	
+    	logger.info("Invalid JWT token!!!");
+    	
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
         
         return exchange.getResponse().setComplete();

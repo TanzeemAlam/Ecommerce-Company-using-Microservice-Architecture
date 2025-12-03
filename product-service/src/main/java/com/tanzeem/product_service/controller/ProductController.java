@@ -4,11 +4,8 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.tanzeem.product_service.dto.*;
@@ -37,8 +34,9 @@ public class ProductController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ApiResponse> addProduct(@Valid @RequestBody ProductRequestDto dto) {
-		productService.addProduct(convertToEntity(dto));
+	public ResponseEntity<ApiResponse> addProduct(@Valid @RequestBody ProductRequestDto dto, @RequestHeader("Authorization") String authHeader) {
+		productService.addProduct(convertToEntity(dto), authHeader);
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(AppConstants.PRODUCT_CREATED));
 	}
 	

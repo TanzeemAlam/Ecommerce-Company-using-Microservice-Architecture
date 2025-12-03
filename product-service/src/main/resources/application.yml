@@ -3,10 +3,4 @@ spring:
     name: product-service
 
   config:
-    import: optional:configserver:http://localhost:8888
- 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: refresh
+    import: optional:configserver:http://172.27.64.1:8888

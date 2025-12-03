@@ -6,7 +6,7 @@ import com.tanzeem.product_service.dto.ProductResponseDto;
 import com.tanzeem.product_service.entity.Product;
 
 public interface ProductService {
-	public Product addProduct(Product p);
+	public void addProduct(Product p, String token);
 
 	public List<ProductResponseDto> getAllProducts(String token);
 

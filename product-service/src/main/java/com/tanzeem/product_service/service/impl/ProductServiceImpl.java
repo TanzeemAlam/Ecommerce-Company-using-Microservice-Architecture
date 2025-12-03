@@ -5,17 +5,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.tanzeem.product_service.dto.*;
 import com.tanzeem.product_service.entity.Product;
+import com.tanzeem.product_service.producer.NotificationProducer;
 import com.tanzeem.product_service.repository.ProductRepository;
 import com.tanzeem.product_service.service.*;
 import com.tanzeem.product_service.util.AppConstants;
 
 @Service
 public class ProductServiceImpl implements ProductService{
+
+	private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -26,11 +30,28 @@ public class ProductServiceImpl implements ProductService{
 	@Autowired
 	private ProductDetailClient productDetailClient;
 	
+	@Autowired
+	private NotificationProducer kafkaService;
+	
+	@Autowired
+	private InventoryClient inventoryClient;
+	
 	@Override
-	public Product addProduct(Product p) {
+	public void addProduct(Product p, String token) {
 		p.setCreatedAt(LocalDateTime.now());
 		
-		return productRepository.save(p);
+		productRepository.save(p);
+		
+		inventoryClient.addProductInInventory(new InventoryDto(p.getId(), p.getSku()), token);	//Calling inventory service to add product
+		
+		try {
+			kafkaService.produceKafkaEvent(AppConstants.KAFKA_PRODUCT_REGISTERED_EVENT,
+								p.getName(), 
+								AppConstants.PRODUCT_CREATED,
+								LocalDateTime.now());
+		} catch (Exception e) {
+			logger.error(AppConstants.KAFKA_ERROR +  e.getMessage());
+		}
 	}
 
 	@Override

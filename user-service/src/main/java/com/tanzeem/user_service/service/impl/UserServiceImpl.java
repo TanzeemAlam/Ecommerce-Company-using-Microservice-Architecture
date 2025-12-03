@@ -2,6 +2,8 @@ package com.tanzeem.user_service.service.impl;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,14 +18,16 @@ import jakarta.validation.Valid;
 @Service
 public class UserServiceImpl implements UserService {
 
-	@Autowired
-	PasswordEncoder passwordEncoder;
+	private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 	
 	@Autowired
-	UserRepository userRepository;
+	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	VerificationTokenRepository verificationTokenRepository;
+	private UserRepository userRepository;
+	
+	@Autowired
+	private VerificationTokenRepository verificationTokenRepository;
 	
 	@Override
 	public User register(@Valid User user) {
@@ -57,5 +61,4 @@ public class UserServiceImpl implements UserService {
 		
 		return AppConstants.VALID_TOKEN;
 	}
-
 }

@@ -14,4 +14,6 @@ public interface ProductDetailService {
 	public String updateProductDetail(Long id, ProductDetail updatedProduct);
 
 	public String deleteProductDetail(Long id);
+	
+	public Boolean validateProduct(Long id, String token);
 }

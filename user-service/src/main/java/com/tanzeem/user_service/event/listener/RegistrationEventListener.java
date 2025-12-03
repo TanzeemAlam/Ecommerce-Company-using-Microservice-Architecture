@@ -1,5 +1,6 @@
 package com.tanzeem.user_service.event.listener;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Component;
 
 import com.tanzeem.user_service.entity.User;
 import com.tanzeem.user_service.event.RegistrationEvent;
+import com.tanzeem.user_service.producer.NotificationProducer;
 import com.tanzeem.user_service.service.UserService;
+import com.tanzeem.user_service.util.AppConstants;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +23,9 @@ public class RegistrationEventListener implements ApplicationListener<Registrati
 	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	private NotificationProducer kafkaService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(RegistrationEventListener.class);
 	
@@ -36,5 +42,14 @@ public class RegistrationEventListener implements ApplicationListener<Registrati
 					+ token;
 		
 		logger.info("Click verfication link to verify user: {}", url);
+		
+		try {
+			kafkaService.produceKafkaEvent(AppConstants.KAFKA_USER_REGISTERED_EVENT,
+								user.getUsername(), 
+								AppConstants.USER_REGISTRATION_SUCCESS + " - " + AppConstants.VERIFY_REGISTRATION + url,
+								LocalDateTime.now());
+		} catch (Exception e) {
+			logger.error(AppConstants.KAFKA_ERROR +  e.getMessage());
+		}
 	}
 }

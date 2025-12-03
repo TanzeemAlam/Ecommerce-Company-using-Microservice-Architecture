@@ -118,7 +118,35 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>		
+		
+		<!-- Distributed Tracing using Micrometer & Zipkin-->
+	    <dependency>
+	        <groupId>io.micrometer</groupId>
+	        <artifactId>micrometer-tracing-bridge-brave</artifactId>
+	    </dependency>
+	
+	    <dependency>
+	        <groupId>io.zipkin.reporter2</groupId>
+	        <artifactId>zipkin-reporter-brave</artifactId>
+	    </dependency>	
+			
+	    <dependency>				<!-- Logging with correlation -->
+	      <groupId>org.springframework.boot</groupId>
+	      <artifactId>spring-boot-starter-logging</artifactId>
+	    </dependency>
+	    
+	    <dependency>				<!-- Reactor contet propagation (Must have to propagate zipkin trace IDs-->
+		  <groupId>io.projectreactor</groupId>
+		  <artifactId>reactor-tools</artifactId>
+		</dependency>
+		
+		<!-- Kafka dependencies-->
+		<dependency>
+		  <groupId>org.springframework.kafka</groupId>
+		  <artifactId>spring-kafka</artifactId>
+		</dependency>
 	</dependencies>
+	
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
