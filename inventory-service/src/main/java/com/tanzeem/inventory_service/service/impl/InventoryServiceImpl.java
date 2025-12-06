@@ -17,18 +17,11 @@ public class InventoryServiceImpl implements InventoryService {
 	@Autowired
 	private InventoryRepository inventoryRepository;
 	
-	@Autowired
-	private ProductClient productClient;
-	
 	@Override
 	public String addInventoryProduct(Inventory inventory) { 
-		if (productClient.validateProduct(inventory.getProductId())) {
-			inventoryRepository.save(inventory);
+		inventoryRepository.save(inventory);
 			
-			return AppConstants.PRODUCT_ADDED;
-		}
-		
-		return AppConstants.INVALID_PRODUCT;	
+		return AppConstants.PRODUCT_ADDED;
 	}
 
 	@Override

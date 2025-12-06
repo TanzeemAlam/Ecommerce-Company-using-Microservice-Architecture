@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.tanzeem.product_service.dto.*;
 import com.tanzeem.product_service.entity.Product;
+import com.tanzeem.product_service.producer.InventoryProducer;
 import com.tanzeem.product_service.producer.NotificationProducer;
 import com.tanzeem.product_service.repository.ProductRepository;
 import com.tanzeem.product_service.service.*;
@@ -31,10 +32,10 @@ public class ProductServiceImpl implements ProductService{
 	private ProductDetailClient productDetailClient;
 	
 	@Autowired
-	private NotificationProducer kafkaService;
+	private NotificationProducer kafkaNotificationProducer;
 	
 	@Autowired
-	private InventoryClient inventoryClient;
+	private InventoryProducer kafkaInventoryProducer;
 	
 	@Override
 	public void addProduct(Product p, String token) {
@@ -42,10 +43,15 @@ public class ProductServiceImpl implements ProductService{
 		
 		productRepository.save(p);
 		
-		inventoryClient.addProductInInventory(new InventoryDto(p.getId(), p.getSku()), token);	//Calling inventory service to add product
-		
 		try {
-			kafkaService.produceKafkaEvent(AppConstants.KAFKA_PRODUCT_REGISTERED_EVENT,
+			//Calling inventory service to add product
+			kafkaInventoryProducer.produceKafkaEvent(AppConstants.KAFKA_PRODUCT_REGISTERED_EVENT,
+								new InventoryDto(p.getId(), p.getSku()),
+								AppConstants.PRODUCT_CREATED,
+								LocalDateTime.now());	
+			
+			//Calling notification service to add product
+			kafkaNotificationProducer.produceKafkaEvent(AppConstants.KAFKA_PRODUCT_REGISTERED_EVENT,
 								p.getName(), 
 								AppConstants.PRODUCT_CREATED,
 								LocalDateTime.now());

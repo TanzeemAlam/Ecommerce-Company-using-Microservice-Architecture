@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tanzeem.product_service.dto.ProductEvent;
+import com.tanzeem.product_service.event.ProductEvent;
 
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;

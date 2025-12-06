@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -14,7 +15,7 @@ import lombok.*;
 public class Inventory {
 
 	@Id
-	@NotBlank(message = "Id cannot be blank")
+	@NotNull(message = "Id cannot be blank")
 	private Long productId;
 	
 	@NotBlank(message = "SKU is mandatory")
@@ -27,4 +28,11 @@ public class Inventory {
 	private Long available = 0L;
 	
 	private LocalDateTime createdAt;
+	
+	public Inventory(Long productId, String sku) {
+		this.productId = productId;
+		this.sku = sku;
+		
+		this.createdAt = LocalDateTime.now();
+	}
 }

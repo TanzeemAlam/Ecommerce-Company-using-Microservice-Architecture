@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: notification-service
+  config:
+    import: optional:configserver:http://172.27.64.1:8888

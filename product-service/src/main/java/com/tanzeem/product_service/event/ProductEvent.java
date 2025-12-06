@@ -1,4 +1,4 @@
-package com.tanzeem.product_service.dto;
+package com.tanzeem.product_service.event;
 
 import java.time.LocalDateTime;
 

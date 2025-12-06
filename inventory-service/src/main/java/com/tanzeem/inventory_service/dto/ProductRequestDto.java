@@ -1,6 +1,7 @@
 package com.tanzeem.inventory_service.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductRequestDto {
 	
-	@NotBlank(message = "Id cannot be blank")
+	@NotNull(message = "Id cannot be blank")
 	private Long productId;
 	
 	@NotBlank(message = "SKU is mandatory")

@@ -4,10 +4,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.tanzeem.product_service.dto.ProductDetailDto;
+
+import reactor.core.publisher.Mono;
 
 @Component
 public class ProductDetailClient {

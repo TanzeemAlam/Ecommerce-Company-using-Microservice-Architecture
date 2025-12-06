@@ -61,6 +61,16 @@ public class ProductDetailController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(AppConstants.NOT_FOUND));
 	}
 	
+	@GetMapping("/{id}/product")
+	public ResponseEntity<?> getProductDetailWithProduct(@PathVariable Long id) {
+		ProductDetail productDetail = productDetailService.getProductDetail(id);
+		
+		if (productDetail != null) 
+			return ResponseEntity.status(HttpStatus.OK).body(convertToDto(productDetail));
+		else 
+			return ResponseEntity.status(HttpStatus.OK).body(new ProductDetailResponseDto());
+	}
+	
 	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponse> updateProductDetail(@PathVariable Long id, @Valid @RequestBody ProductDetail productDetail) {
 		String response = productDetailService.updateProductDetail(id, productDetail);

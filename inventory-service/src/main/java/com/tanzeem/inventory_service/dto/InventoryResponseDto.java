@@ -1,6 +1,7 @@
 package com.tanzeem.inventory_service.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InventoryResponseDto {
 	
-	@NotBlank
+	@NotNull
 	private Long productId;
 	
 	@NotBlank

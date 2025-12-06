@@ -145,6 +145,12 @@
 		  <groupId>io.projectreactor</groupId>
 		  <artifactId>reactor-tools</artifactId>
 		</dependency>
+		
+		<!-- Kafka dependencies-->
+		<dependency>
+		  <groupId>org.springframework.kafka</groupId>
+		  <artifactId>spring-kafka</artifactId>
+		</dependency>
 	</dependencies>
 	
 	<dependencyManagement>
