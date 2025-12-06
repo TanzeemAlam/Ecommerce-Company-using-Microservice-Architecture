@@ -10,13 +10,17 @@ public interface InventoryService {
 
 	public String addInventoryProduct(Inventory inventory);
 	
+	public String addProductStockCount(Long id, InventoryDto inventory);
+
+	public String updateProductStockCount(Long id, InventoryDto updatedProduct);
+	
 	public Inventory getInventoryProduct(Long id);
 	
 	public List<Inventory> getAllInventoryProduct();
 	
-	public String updateInventoryProduct(Long id, InventoryDto updatedProduct);
-	
 	public String reserveProduct(InventoryAdjustmentRequestDto dto);
 	
 	public String releaseProduct(InventoryAdjustmentRequestDto dto);
+	
+	public String confirmProductSale(InventoryAdjustmentRequestDto dto);
 }

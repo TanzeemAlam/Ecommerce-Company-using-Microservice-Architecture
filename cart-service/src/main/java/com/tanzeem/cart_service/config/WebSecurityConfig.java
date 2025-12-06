@@ -1,4 +1,4 @@
-package com.tanzeem.inventory_service.config;
+package com.tanzeem.cart_service.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import com.tanzeem.inventory_service.filter.JwtFilter;
+import com.tanzeem.cart_service.filter.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
-	private static final String BASE_URL = "/inventory/**";
-	private static final String BASE_URL_WITHOUT_STAR = "/inventory";
+	
+	private static final String BASE_URL = "/products/**";
+	private static final String BASE_URL_WITHOUT_STAR = "/products";
 	
 	@Autowired
 	private JwtFilter jwtFilter;
@@ -31,21 +32,20 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests(
 					auth -> 
 						auth.requestMatchers(BASE_URL_WITHOUT_STAR + "/config").permitAll()
-						.requestMatchers(HttpMethod.GET, BASE_URL).hasAnyRole("USER", "ADMIN")
-						.requestMatchers(HttpMethod.POST,
-											BASE_URL_WITHOUT_STAR + "/reserve",
-											BASE_URL_WITHOUT_STAR + "/release").hasAnyRole("USER", "ADMIN")
-						.requestMatchers(HttpMethod.POST, BASE_URL).hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, BASE_URL).hasRole("ADMIN")
-						.anyRequest().authenticated() )
+							.anyRequest().authenticated() )
 			.addFilterBefore(jwtFilter, AuthorizationFilter.class);
 	  
 		  return http.build();
 	}
+	 
 	
+	@Bean
+	public WebClient webClient(WebClient.Builder builder) {
+		return builder.build();
+	}
+	 
 	@Bean
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
-	}	
+	}
 }
-

@@ -35,7 +35,23 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public String updateInventoryProduct(Long id, InventoryDto updatedProduct) {
+	public String addProductStockCount(Long id, InventoryDto dto) {
+		Inventory product = inventoryRepository.findById(id).orElse(null);
+		
+		if (product != null) {
+			product.setQuantity(product.getQuantity() + dto.getQuantity());
+			product.setAvailable(product.getAvailable() + dto.getQuantity());
+			
+			inventoryRepository.save(product);
+			
+			return AppConstants.PRODUCT_QUANTITY_UPDATED;
+		}
+		
+		return AppConstants.NOT_FOUND;
+	}
+
+	@Override
+	public String updateProductStockCount(Long id, InventoryDto updatedProduct) {
 		Inventory product = inventoryRepository.findById(id).orElse(null);
 		
 		if (product != null) {
@@ -58,7 +74,9 @@ public class InventoryServiceImpl implements InventoryService {
 			if (product.getAvailable() >= dto.getQuantity()) {
 				product.setReserved(product.getReserved() + dto.getQuantity());					//Adding requested quantity into reserved product
 				
-				product.setAvailable(product.getAvailable() - dto.getQuantity());				//Removing requested quantity from available product
+				product.setQuantity(product.getQuantity() - dto.getQuantity());					//Removing requested quantity from total product quantity
+				
+				inventoryRepository.save(product);
 				
 				return AppConstants.PRODUCT_RESERVED;
 			}
@@ -78,7 +96,29 @@ public class InventoryServiceImpl implements InventoryService {
 			
 			product.setAvailable(product.getAvailable() + dto.getQuantity());					//Adding quantity into available product
 			
+			inventoryRepository.save(product);
+			
 			return AppConstants.PRODUCT_RELEASED;
+		}
+		
+		return AppConstants.NOT_FOUND;
+	}
+
+	@Override
+	public String confirmProductSale(InventoryAdjustmentRequestDto dto) {
+		Inventory product = inventoryRepository.findById(dto.getProductId()).orElse(null);
+		
+		if (product != null) {
+			if (product.getReserved() >= dto.getQuantity()) {
+				product.setReserved(product.getReserved() - dto.getQuantity());						//Removing quantity from reserved product
+				product.setAvailable(product.getAvailable() - dto.getQuantity());					//Removing quantity from available product
+				
+				inventoryRepository.save(product);
+				
+				return AppConstants.PRODUCT_SALE_CONFIRMED;
+			}
+			
+			return AppConstants.PRODUCT_RESERVED_QUANTITY_LOW;
 		}
 		
 		return AppConstants.NOT_FOUND;

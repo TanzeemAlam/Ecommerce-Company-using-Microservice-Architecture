@@ -25,15 +25,22 @@ public class InventoryController {
 	@Autowired
 	private ModelMapper mapper;
 	
-	@PostMapping
-	public ResponseEntity<ApiResponse> addInventoryProduct(@Valid @RequestBody ProductRequestDto dto) {
-		String response = inventoryService.addInventoryProduct(convertToEntity(dto));
+	@PostMapping("/{id}")
+	public ResponseEntity<ApiResponse> addProductStockCount(@Valid @PathVariable Long id, @Valid @RequestBody InventoryDto dto) {
+		String response = inventoryService.addProductStockCount(id, dto);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
+	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<ApiResponse> updateProductStockCount(@PathVariable Long id, @Valid @RequestBody InventoryDto dto) {
+		String response = inventoryService.updateProductStockCount(id, dto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getInventoryProduct(@Valid @RequestParam Long id) {
+	public ResponseEntity<?> getInventoryProduct(@Valid @PathVariable Long id) {
 		Inventory product = inventoryService.getInventoryProduct(id);
 		
 		if (product != null) 
@@ -45,13 +52,6 @@ public class InventoryController {
 	@GetMapping
 	public List<InventoryResponseDto> getAllInventoryProducts() {
 		return convertToDtoList(inventoryService.getAllInventoryProduct());
-	}
-	
-	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse> updateInventoryProduct(@PathVariable Long id, @Valid @RequestBody InventoryDto dto) {
-		String response = inventoryService.updateInventoryProduct(id, dto);
-		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
 	@PostMapping("/reserve")
@@ -67,13 +67,17 @@ public class InventoryController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
+	
+	@PostMapping("/sold")
+	public ResponseEntity<ApiResponse> confirmProductSale(@Valid @RequestBody InventoryAdjustmentRequestDto dto) {
+		String response = inventoryService.confirmProductSale(dto);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
+	}
 
 	/**
 	 * Mapper methods
 	 */
-	private Inventory convertToEntity(ProductRequestDto dto) {
-		return mapper.map(dto, Inventory.class);
-	}
 	
 	private InventoryResponseDto convertToDto(Inventory product) {
 		return mapper.map(product, InventoryResponseDto.class);
