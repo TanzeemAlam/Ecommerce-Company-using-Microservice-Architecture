@@ -29,28 +29,32 @@ public class CartController {
 	
 	@PostMapping("/{userId}/items")
 	public ResponseEntity<ApiResponse> addItemToCart(@Valid @PathVariable Long userId, @Valid @RequestBody CartAdjustmentDto dto, @RequestHeader("Authorization") String authHeader) {
-		cartService.addCartItem(userId, dto, authHeader);
+		String response = cartService.addCartItem(userId, dto, authHeader);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(AppConstant.ITEM_ADDED));
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
-	@DeleteMapping("/{userId}/items/{itemId}")
-	public ResponseEntity<ApiResponse> removeItemFromCart(@Valid @PathVariable Long userId, @Valid @PathVariable Long itemId) {
-		cartService.removeCartItem(userId, itemId);
+	@DeleteMapping("/{userId}/items/{productId}")
+	public ResponseEntity<ApiResponse> removeItemFromCart(@Valid @PathVariable Long userId, @Valid @PathVariable Long productId) {
+		String response = cartService.removeCartItem(userId, productId);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(AppConstant.ITEM_ADDED));
+		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
-	@PutMapping("/{userId}/items/{itemId}")
-	public ResponseEntity<ApiResponse> updateItemFromCart(@Valid @PathVariable Long userId, @Valid @PathVariable Long itemId, @Valid @RequestBody CartAdjustmentDto dto) {
-		String response = cartService.updateCartItem(userId, itemId, dto);
+	@PutMapping("/{userId}/items")
+	public ResponseEntity<ApiResponse> updateItemFromCart(@Valid @PathVariable Long userId, @Valid @RequestBody CartAdjustmentDto dto) {
+		String response = cartService.updateCartItem(userId, dto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
 	@GetMapping("/{userId}")
-	public List<CartItemDto> getCart(@Valid @PathVariable Long userId) {
-		return cartService.getAllCartItems(userId);
+	public ResponseEntity<?> getCart(@Valid @PathVariable Long userId) {
+		List<CartItemDto> cartItemList = cartService.getAllCartItems(userId);
+		
+		if (cartItemList == null) return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(AppConstant.EMPTY_CART));
+		
+		return ResponseEntity.status(HttpStatus.OK).body(cartItemList);
 	}
 	
 	@DeleteMapping("/{userId}")

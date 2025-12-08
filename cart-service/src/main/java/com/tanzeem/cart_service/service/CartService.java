@@ -11,9 +11,9 @@ public interface CartService {
 
 	String addCartItem(@Valid Long userId, @Valid CartAdjustmentDto dto, String token);
 
-	void removeCartItem(@Valid Long userId, @Valid Long itemId);
+	String removeCartItem(@Valid Long userId, @Valid Long productId);
 
-	String updateCartItem(@Valid Long userId, @Valid Long itemId, @Valid CartAdjustmentDto dto);
+	String updateCartItem(@Valid Long userId, @Valid CartAdjustmentDto dto);
 
 	List<CartItemDto> getAllCartItems(@Valid Long userId);
 

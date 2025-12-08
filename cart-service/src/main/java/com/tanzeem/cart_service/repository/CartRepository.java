@@ -8,4 +8,5 @@ import com.tanzeem.cart_service.entity.UserCart;
 @Repository
 public interface CartRepository extends JpaRepository<UserCart, Long>{
 	UserCart findByUserId(Long userId);
+	void deleteByCartId(Long cartId);
 }

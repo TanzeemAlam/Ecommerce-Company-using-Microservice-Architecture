@@ -85,6 +85,11 @@ public class ProductDetailController {
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
+	@GetMapping("/{id}/price")
+	public double getProductPrice(@Valid @PathVariable Long id) {
+		return productDetailService.getProductPrice(id);
+	}
+	
 	/**
 	 * All DTO to Entity and vice versa operations
 	 */

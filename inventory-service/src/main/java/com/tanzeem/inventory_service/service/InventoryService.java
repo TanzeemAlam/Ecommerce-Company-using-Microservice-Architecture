@@ -6,6 +6,8 @@ import com.tanzeem.inventory_service.dto.InventoryDto;
 import com.tanzeem.inventory_service.dto.InventoryAdjustmentRequestDto;
 import com.tanzeem.inventory_service.entity.Inventory;
 
+import jakarta.validation.Valid;
+
 public interface InventoryService {
 
 	public String addInventoryProduct(Inventory inventory);
@@ -23,4 +25,6 @@ public interface InventoryService {
 	public String releaseProduct(InventoryAdjustmentRequestDto dto);
 	
 	public String confirmProductSale(InventoryAdjustmentRequestDto dto);
+
+	public String validateItemFromInventory(@Valid Long productId, @Valid Long quantity);
 }

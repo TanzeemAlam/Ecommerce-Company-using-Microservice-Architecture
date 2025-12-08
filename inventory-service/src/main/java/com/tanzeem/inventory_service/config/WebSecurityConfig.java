@@ -37,6 +37,7 @@ public class WebSecurityConfig {
 											BASE_URL_WITHOUT_STAR + "/release").hasAnyRole("USER", "ADMIN")
 						.requestMatchers(HttpMethod.POST, BASE_URL).hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, BASE_URL).hasRole("ADMIN")
+						
 						.anyRequest().authenticated() )
 			.addFilterBefore(jwtFilter, AuthorizationFilter.class);
 	  

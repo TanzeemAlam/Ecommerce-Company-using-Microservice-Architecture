@@ -12,6 +12,8 @@ import com.tanzeem.product_detail_service.service.ProductClient;
 import com.tanzeem.product_detail_service.service.ProductDetailService;
 import com.tanzeem.product_detail_service.util.AppConstants;
 
+import jakarta.validation.Valid;
+
 @Service
 public class ProductDetailServiceImpl implements ProductDetailService{
 
@@ -73,5 +75,14 @@ public class ProductDetailServiceImpl implements ProductDetailService{
 	@Override
 	public Boolean validateProduct(Long id, String token) {
 		return productClient.validateProduct(id, token);
+	}
+
+	@Override
+	public double getProductPrice(@Valid Long id) {
+		ProductDetail p = productDetailRepository.findById(id).orElse(null);
+		
+		if (p != null)	return p.getPrice();
+		
+		return 0;
 	}
 }

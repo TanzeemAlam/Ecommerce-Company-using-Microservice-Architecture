@@ -11,12 +11,12 @@ public class ProductDetailClient {
 	@Autowired
 	private WebClient webClient;
 	
-	public Double getProductPriceById(Long id, String token) {
+	public double getProductPriceById(Long id, String token) {
 		return webClient.get()
 				.uri("http://localhost:8083/product-details/" + id + "/price")
 				.header(HttpHeaders.AUTHORIZATION, token)
 				.retrieve()
-				.bodyToMono(Double.class)
+				.bodyToMono(double.class)
 				.block();
 	}
 }

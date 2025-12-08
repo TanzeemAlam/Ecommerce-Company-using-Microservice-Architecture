@@ -29,7 +29,7 @@ public class UserCart {
 	private String status;										//ACTIVE, ORDERED, ABANDONED
 	
 	
-	private BigDecimal totalAmount;
+	private double totalAmount;
 	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;

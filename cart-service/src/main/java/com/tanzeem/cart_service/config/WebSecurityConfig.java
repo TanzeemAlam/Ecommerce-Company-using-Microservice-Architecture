@@ -20,8 +20,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 	
-	private static final String BASE_URL = "/products/**";
-	private static final String BASE_URL_WITHOUT_STAR = "/products";
+	private static final String BASE_URL = "/cart/**";
+	private static final String BASE_URL_WITHOUT_STAR = "/cart";
 	
 	@Autowired
 	private JwtFilter jwtFilter;
@@ -32,12 +32,17 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests(
 					auth -> 
 						auth.requestMatchers(BASE_URL_WITHOUT_STAR + "/config").permitAll()
+							.requestMatchers(BASE_URL).hasAnyRole("USER", "ADMIN")
 							.anyRequest().authenticated() )
 			.addFilterBefore(jwtFilter, AuthorizationFilter.class);
 	  
 		  return http.build();
 	}
 	 
+	@Bean
+	public WebClient.Builder webClientBuilder() {
+		return WebClient.builder();
+	}
 	
 	@Bean
 	public WebClient webClient(WebClient.Builder builder) {

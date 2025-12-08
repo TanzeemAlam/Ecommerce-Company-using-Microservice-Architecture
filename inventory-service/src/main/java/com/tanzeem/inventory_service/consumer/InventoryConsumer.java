@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.tanzeem.inventory_service.dto.InventoryAdjustmentRequestDto;
 import com.tanzeem.inventory_service.entity.Inventory;
-import com.tanzeem.inventory_service.event.CartReleaseEvent;
-import com.tanzeem.inventory_service.event.CartReserveEvent;
+import com.tanzeem.inventory_service.event.CartEvent;
 import com.tanzeem.inventory_service.event.InventoryEvent;
 import com.tanzeem.inventory_service.service.InventoryService;
 
@@ -34,8 +34,8 @@ private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.c
 			
 	private static final Map<String, Class<?>> TOPIC_CLASS_MAP = Map.of(
 	        "inventory-events", InventoryEvent.class,
-	        "cart-reserve-events", CartReserveEvent.class,
-	        "cart-release-events", CartReleaseEvent.class
+	        "cart-reserve-events", CartEvent.class,
+	        "cart-release-events", CartEvent.class
 	);
 	
 	@KafkaListener(topics = "inventory-events", groupId = "inventory-group", containerFactory = "kafkaListenerContainerFactory")
@@ -47,17 +47,28 @@ private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.c
 		inventoryService.addInventoryProduct(new Inventory(
 													event.getDto().getProductId(), 
 													event.getDto().getSku()));
+	}
+	
+	@KafkaListener(topics = "cart-reserve-events", groupId = "cart-group", containerFactory = "kafkaListenerContainerFactory")
+	public void consumerInventoryReserveEvent(ConsumerRecord<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		
-		logger.info("NOTIFICATION RECEIVED:\n{\n" +
-		         "  \"Event Type\": \"{}\",\n" +
-		         "  \"Product ID\": \"{}\",\n" +
-		         "  \"Message\": \"{}\",\n" +
-		         "  \"Timestamp\": \"{}\"\n" +
-		         "}", 
-		         event.getEventType(),
-		         event.getDto().getProductId(),
-		         event.getMessage(),
-		         event.getTimestamp());
+		CartEvent event = (CartEvent) convertToEvent(record.value().toString(), topic);
+		
+		
+		inventoryService.reserveProduct(new InventoryAdjustmentRequestDto(
+				event.getDto().getProductId(),
+				event.getDto().getQuantity()));
+	}
+	
+	@KafkaListener(topics = "cart-release-events", groupId = "cart-group", containerFactory = "kafkaListenerContainerFactory")
+	public void consumerInventoryReleaseEvent(ConsumerRecord<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+		
+		CartEvent event = (CartEvent) convertToEvent(record.value().toString(), topic);
+		
+		
+		inventoryService.releaseProduct(new InventoryAdjustmentRequestDto(
+				event.getDto().getProductId(),
+				event.getDto().getQuantity()));
 	}
 	
 	/********** Helper methods  **********/

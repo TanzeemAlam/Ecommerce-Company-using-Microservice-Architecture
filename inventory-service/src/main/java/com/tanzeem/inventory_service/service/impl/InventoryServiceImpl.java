@@ -11,6 +11,8 @@ import com.tanzeem.inventory_service.repository.InventoryRepository;
 import com.tanzeem.inventory_service.service.*;
 import com.tanzeem.inventory_service.util.AppConstants;
 
+import jakarta.validation.Valid;
+
 @Service
 public class InventoryServiceImpl implements InventoryService {
 
@@ -74,7 +76,7 @@ public class InventoryServiceImpl implements InventoryService {
 			if (product.getAvailable() >= dto.getQuantity()) {
 				product.setReserved(product.getReserved() + dto.getQuantity());					//Adding requested quantity into reserved product
 				
-				product.setQuantity(product.getQuantity() - dto.getQuantity());					//Removing requested quantity from total product quantity
+				product.setAvailable(product.getAvailable() - dto.getQuantity());					//Removing requested quantity from total available product
 				
 				inventoryRepository.save(product);
 				
@@ -112,6 +114,7 @@ public class InventoryServiceImpl implements InventoryService {
 			if (product.getReserved() >= dto.getQuantity()) {
 				product.setReserved(product.getReserved() - dto.getQuantity());						//Removing quantity from reserved product
 				product.setAvailable(product.getAvailable() - dto.getQuantity());					//Removing quantity from available product
+				product.setQuantity(product.getQuantity() - dto.getQuantity());
 				
 				inventoryRepository.save(product);
 				
@@ -122,5 +125,18 @@ public class InventoryServiceImpl implements InventoryService {
 		}
 		
 		return AppConstants.NOT_FOUND;
+	}
+
+	@Override
+	public String validateItemFromInventory(@Valid Long productId, @Valid Long quantity) {
+		Inventory product = inventoryRepository.findById(productId).orElse(null);
+		
+		if (product != null) {
+			if (product.getAvailable() >= quantity)	return AppConstants.VALID_INVENTORY_ITEM;
+			
+			return AppConstants.PRODUCT_QUANTITY_LOW;
+		}
+		
+		return AppConstants.INVALID_PRODUCT;
 	}
 }

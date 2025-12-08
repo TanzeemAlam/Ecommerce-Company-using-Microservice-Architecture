@@ -25,23 +25,23 @@ public class InventoryController {
 	@Autowired
 	private ModelMapper mapper;
 	
-	@PostMapping("/{id}")
-	public ResponseEntity<ApiResponse> addProductStockCount(@Valid @PathVariable Long id, @Valid @RequestBody InventoryDto dto) {
-		String response = inventoryService.addProductStockCount(id, dto);
+	@PostMapping("/{productId}")
+	public ResponseEntity<ApiResponse> addProductStockCount(@Valid @PathVariable Long productId, @Valid @RequestBody InventoryDto dto) {
+		String response = inventoryService.addProductStockCount(productId, dto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
-	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse> updateProductStockCount(@PathVariable Long id, @Valid @RequestBody InventoryDto dto) {
-		String response = inventoryService.updateProductStockCount(id, dto);
+	@PutMapping("/{productId}")
+	public ResponseEntity<ApiResponse> updateProductStockCount(@PathVariable Long productId, @Valid @RequestBody InventoryDto dto) {
+		String response = inventoryService.updateProductStockCount(productId, dto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
 	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getInventoryProduct(@Valid @PathVariable Long id) {
-		Inventory product = inventoryService.getInventoryProduct(id);
+	@GetMapping("/{productId}")
+	public ResponseEntity<?> getInventoryProduct(@Valid @PathVariable Long productId) {
+		Inventory product = inventoryService.getInventoryProduct(productId);
 		
 		if (product != null) 
 			return ResponseEntity.status(HttpStatus.OK).body(convertToDto(product));
@@ -54,19 +54,21 @@ public class InventoryController {
 		return convertToDtoList(inventoryService.getAllInventoryProduct());
 	}
 	
-	@PostMapping("/reserve")
-	public ResponseEntity<ApiResponse> reserveProductFromInventory(@Valid @RequestBody InventoryAdjustmentRequestDto dto) {
-		String response = inventoryService.reserveProduct(dto);
-		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
-	}
-	
-	@PostMapping("/release")
-	public ResponseEntity<ApiResponse> releaseProductFromInventory(@Valid @RequestBody InventoryAdjustmentRequestDto dto) {
-		String response = inventoryService.releaseProduct(dto);
-		
-		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
-	}
+	/*
+	 * @PostMapping("/reserve") public ResponseEntity<ApiResponse>
+	 * reserveProductFromInventory(@Valid @RequestBody InventoryAdjustmentRequestDto
+	 * dto) { String response = inventoryService.reserveProduct(dto);
+	 * 
+	 * return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
+	 * }
+	 * 
+	 * @PostMapping("/release") public ResponseEntity<ApiResponse>
+	 * releaseProductFromInventory(@Valid @RequestBody InventoryAdjustmentRequestDto
+	 * dto) { String response = inventoryService.releaseProduct(dto);
+	 * 
+	 * return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
+	 * }
+	 */
 	
 	@PostMapping("/sold")
 	public ResponseEntity<ApiResponse> confirmProductSale(@Valid @RequestBody InventoryAdjustmentRequestDto dto) {
@@ -74,7 +76,12 @@ public class InventoryController {
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	}
-
+	
+	@GetMapping("/{productId}/quantity/{quantity}/validate")
+	public String validateItemFromInventory(@Valid @PathVariable Long productId, @Valid @PathVariable Long quantity) {
+		return inventoryService.validateItemFromInventory(productId, quantity);
+	}
+	
 	/**
 	 * Mapper methods
 	 */
