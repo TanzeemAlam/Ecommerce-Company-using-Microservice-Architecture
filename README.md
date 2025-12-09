@@ -110,7 +110,7 @@ All included Microservices:
 1. POST     - /order/{userId}                  - Create order via userId and cartId followed by cart status update and inventory stock update kafka events
 2. GET      - /order/{userId}                  - Get order status
 
-### Kafka Events Collection
+### Kafka Events Flow
 ## Topics
 1. user-events
 2. product-events
@@ -146,5 +146,31 @@ All included Microservices:
 ## Docker Containers
 Used docker-compose.yml file to create all 3 containers
 1. Zipkin - openzipkin/zipkin:latest
+   Provides distributed tracing and dependency graph visualization
 2. Zookeeper - confluentinc/cp-zookeeper:7.5.0
+   Required for Kafka cluster coordination
 3. Kafka - confluentinc/cp-kafka:7.5.0
+   Enables asynchronous communication between microservices, improving decoupling and system reliability
+
+## Infrastructure Summary
+**Why Microservices?**
+1. Independent deployment
+2. Clear domain-driven boundaries
+3. High scalability for read/write-heavy services like Cart, Product, and Inventory
+4. Fault isolation
+
+**Why Kafka?**
+1. Decouples services
+2. Ensures eventual consistency in Inventory, Cart, and Order
+3. Provides reliable communication for high-volume product/order events
+
+**Why Zookeeper & Kafka in Docker?**
+1. Eliminates need for local installations
+2. Ensures consistent reproducible environments
+3. Simplifies development setup via docker-compose
+4. Easily scalable for higher partitions/replicas later
+
+**Why Zipkin?**
+1. Full trace visibility across:
+2. Gateway → User → Cart → Inventory → Product
+3. Helps debug latency issues and broken flows
