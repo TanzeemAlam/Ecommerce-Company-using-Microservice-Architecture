@@ -107,8 +107,15 @@ All included Microservices:
 7. GET     - /cart/{userId}/amount             - Get total cart cart
 
 ## ----------Order APIs----------
-1. POST     - /order/{userId}                  - Create order via userId and cartId followed by cart status update and inventory stock update kafka events
-2. GET      - /order/{userId}                  - Get order status
+1. POST     - /order                           - Create order via userId and cartId followed by cart status update and inventory stock update kafka events
+   {
+      "userId": 4;
+      "billingAddress":"Delhi"
+      "paymentMode":"UPI"
+   }
+2. GET      - /order/{orderId}/status          - Get order status
+3. GET      - /order/{orderId}/cart            - Get all cart items
+4. DELETE   - /order/{orderId}                 - Delete the order
 
 ### Kafka Events Flow
 ## Topics
@@ -117,9 +124,13 @@ All included Microservices:
 3. inventory-events
 4. cart-reserve-events
 5. cart-release-events
+6. cart-lock-events
+7. order-confirm-events
+   
 ## Groups
 1. notification-group
 2. cart-group
+3. order-group
 
 ## ----------User Service----------
 1. Produce - Kafka event for Notification service via "user-events" topic to publish logs
@@ -135,9 +146,14 @@ All included Microservices:
 
 ## ----------Cart Service----------
 1. Produce - Kafka event for Inventory service via "cart-reserve-events" & "cart-release-events" topic to adjust product reserve/release quantity in inventory
+2. Produce - Kafka event for Order service via "order-confirm-events" to update the order status and json data
+3. Consume - Kafka event from Order service via "cart-lock-events" to lock added cart items and update inventory
+4. Consume - Kafka event from Order service via "cart-clear-events" to clear the ordered cart items and delete cart
 
 ## ----------Order Service----------
-1. Produce - Kafka event for Cart service via "order-events" topic to place order which produce further events to confirm products sold
+1. Produce - Kafka event for Cart service via "cart-lock-events" topic to place order which produce further events to confirm products sold
+2. Produce - Kafka event for Cart service via "cart-clear-events" topic to clear the ordered items and delete cart
+3. Consume - Kafka event from Cart service via "order-confirm-events" to update order status and json data
    
 ## ----------Notification Service----------
 1. Consume - Kafka event from User service via "user-events" topic to log UserRegistered, TokenValidation, etc events.
