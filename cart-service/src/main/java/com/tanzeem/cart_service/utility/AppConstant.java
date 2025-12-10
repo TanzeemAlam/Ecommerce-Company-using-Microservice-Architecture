@@ -8,6 +8,7 @@ public class AppConstant {
 	public static final String ITEM_UPDATED								= "Item updated in cart";
 	public static final String ITEM_DELETED								= "Item deleted from cart";
 	public static final String CART_ITEMS_DISCARDED						= "All cart items are discarded";
+	public static final String ITEM_ADJUSTED 							= "Item is adjusted in the inventory to fulfill order";
 	
 	public static final String EMPTY_CART								= "Cart is Empty";
 	public static final String CART_DELETED								= "Cart Deleted";
@@ -20,5 +21,8 @@ public class AppConstant {
 	
 	public static final String RESERVE_CART_ITEM_QUANTITY				= "Cart Item requested quantity is reserved";
 	public static final String RELEASE_CART_ITEM_QUANTITY				= "Cart Item requested quantity is released";
-
+	public static final String CONFIRM_CART_ITEM_QUANTITY 				= "Cart Item requested quantity is confirmed";
+	
+	public static final String CONFIRMED_CART							= "Cart Items are confirmed";
+	public static final String CONFIRM_ORDER 							= "Orded Confirmed";
 }

@@ -2,6 +2,7 @@ package com.tanzeem.cart_service.service;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tanzeem.cart_service.dto.CartAdjustmentDto;
 import com.tanzeem.cart_service.dto.CartItemDto;
 
@@ -20,4 +21,6 @@ public interface CartService {
 	String clearAllCartItems(@Valid Long userId);
 
 	String getTotalCartAmount(@Valid Long userId);
+	
+	void confirmCart(Long userId) throws JsonProcessingException;
 }

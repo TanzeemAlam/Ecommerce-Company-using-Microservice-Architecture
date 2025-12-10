@@ -1,6 +1,5 @@
 package com.tanzeem.cart_service.service.impl;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tanzeem.cart_service.dto.*;
 import com.tanzeem.cart_service.entity.CartItem;
 import com.tanzeem.cart_service.entity.UserCart;
 import com.tanzeem.cart_service.enums.CartStatusEnum;
 import com.tanzeem.cart_service.producer.InventoryProducer;
+import com.tanzeem.cart_service.producer.OrderProducer;
 import com.tanzeem.cart_service.repository.CartItemRepository;
 import com.tanzeem.cart_service.repository.CartRepository;
 import com.tanzeem.cart_service.service.CartService;
@@ -42,7 +43,13 @@ public class CartServiceImpl implements CartService {
 	private InventoryProducer inventoryProducer;
 	
 	@Autowired
+	private OrderProducer orderProducer;
+	
+	@Autowired
 	private ModelMapper mapper;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 	
 	private UserCart createCart(Long userId) {
 		UserCart cart = cartRepository.findByUserId(userId);
@@ -234,6 +241,29 @@ public class CartServiceImpl implements CartService {
 		return AppConstant.EMPTY_CART;
 	}
 	
+	@Override
+	@Transactional
+	public void confirmCart(Long userId) throws JsonProcessingException {
+		UserCart cart = cartRepository.findByUserId(userId);
+		
+		if (cart != null) {
+			
+			//Create cart item list to use after confirming product
+			List<CartItem> cartItemList = cartItemRepository.findAllByCartId(cart.getCartId());
+			
+			createCartAdjustmentDtoList(cartItemList).forEach(cartAdjustmentDto -> produceCartItemConfirmKafkaEvent(cartAdjustmentDto));
+			
+			OrderUpdateDto dto = new OrderUpdateDto();
+			dto.setCartId(cart.getCartId());
+			dto.setUserId(userId);
+			dto.setTotalamount(cart.getTotalAmount());
+			dto.setOrderedItemsJson(objectMapper.writeValueAsString(convertToDtoList(cartItemList)));
+			
+			//Produce Kafka event for Order
+			produceOrderConfirmKafkaEvent(dto);
+		}
+	}
+	
 	/**********************************************************************PRIVATE HELPER METHODS**********************************************************************/
 	
 	/**
@@ -260,6 +290,34 @@ public class CartServiceImpl implements CartService {
 					dto,
 					AppConstant.ITEM_DELETED,
 					getCurrentTime()); 
+		}
+		catch (Exception e) { e.printStackTrace(); }
+	}
+	
+	/**
+	 * Send async kafka event to inventory to confirm the product
+	 */
+	private void produceCartItemConfirmKafkaEvent(CartAdjustmentDto dto) {
+		try { 
+			inventoryProducer.produceCartItemConfirmKafkaEvent(
+					AppConstant.CONFIRM_CART_ITEM_QUANTITY, 
+					dto,
+					AppConstant.ITEM_ADJUSTED,
+					getCurrentTime()); 
+		}
+		catch (Exception e) { e.printStackTrace(); }
+	}
+	
+	/**
+	 * Send async kafka event to order service to confirm the order status
+	 */
+	private void produceOrderConfirmKafkaEvent(OrderUpdateDto dto) {
+		try { 
+			orderProducer.produceOrderConfirmKafkaEvent(
+					AppConstant.CONFIRM_CART_ITEM_QUANTITY,
+					dto,
+					AppConstant.CONFIRM_ORDER,
+					getCurrentTime());
 		}
 		catch (Exception e) { e.printStackTrace(); }
 	}

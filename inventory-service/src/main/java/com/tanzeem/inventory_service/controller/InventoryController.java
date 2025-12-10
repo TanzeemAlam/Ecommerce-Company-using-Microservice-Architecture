@@ -68,14 +68,14 @@ public class InventoryController {
 	 * 
 	 * return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
 	 * }
-	 */
+	 
 	
 	@PostMapping("/sold")
 	public ResponseEntity<ApiResponse> confirmProductSale(@Valid @RequestBody InventoryAdjustmentRequestDto dto) {
 		String response = inventoryService.confirmProductSale(dto);
 		
 		return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse(response));
-	}
+	}*/
 	
 	@GetMapping("/{productId}/quantity/{quantity}/validate")
 	public String validateItemFromInventory(@Valid @PathVariable Long productId, @Valid @PathVariable Long quantity) {

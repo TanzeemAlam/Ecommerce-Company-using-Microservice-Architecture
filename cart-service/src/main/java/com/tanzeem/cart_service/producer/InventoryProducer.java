@@ -13,14 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tanzeem.cart_service.dto.CartAdjustmentDto;
 import com.tanzeem.cart_service.event.InventoryEvent;
 
-import io.micrometer.tracing.Tracer;
-
 @Component
 public class InventoryProducer {
 	
 	//Cart events topic
 	public static final String KAFKA_CART_RESERVE_TOPIC						= "cart-reserve-events";
 	public static final String KAFKA_CART_RELEASE_TOPIC 					= "cart-release-events";
+	public static final String KAFKA_CART_CONFIRM_TOPIC 					= "cart-confirm-events";
 		
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -46,6 +45,20 @@ public class InventoryProducer {
 		
 		ProducerRecord<String, Object> record = new ProducerRecord<String, Object>(
 													KAFKA_CART_RELEASE_TOPIC,
+													objectMapper.writeValueAsString(new InventoryEvent(
+																							eventType, 
+																							dto,
+																							message,
+																							timestamp)
+													));
+		
+		kafkaTemplate.send(record);	
+	}
+	
+	public void produceCartItemConfirmKafkaEvent(String eventType, CartAdjustmentDto dto, String message, LocalDateTime timestamp) throws JsonProcessingException {
+		
+		ProducerRecord<String, Object> record = new ProducerRecord<String, Object>(
+													KAFKA_CART_CONFIRM_TOPIC,
 													objectMapper.writeValueAsString(new InventoryEvent(
 																							eventType, 
 																							dto,

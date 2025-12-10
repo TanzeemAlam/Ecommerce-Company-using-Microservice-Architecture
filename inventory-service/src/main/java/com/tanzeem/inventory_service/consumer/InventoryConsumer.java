@@ -23,7 +23,7 @@ import com.tanzeem.inventory_service.service.InventoryService;
 @Service
 public class InventoryConsumer {
 
-private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.class);
+	private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.class);
 	
 	@Autowired
 	private InventoryService inventoryService;
@@ -35,7 +35,8 @@ private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.c
 	private static final Map<String, Class<?>> TOPIC_CLASS_MAP = Map.of(
 	        "inventory-events", InventoryEvent.class,
 	        "cart-reserve-events", CartEvent.class,
-	        "cart-release-events", CartEvent.class
+	        "cart-release-events", CartEvent.class,
+	        "cart-confirm-events", CartEvent.class
 	);
 	
 	@KafkaListener(topics = "inventory-events", groupId = "inventory-group", containerFactory = "kafkaListenerContainerFactory")
@@ -69,6 +70,19 @@ private static final Logger logger = LoggerFactory.getLogger(InventoryConsumer.c
 		inventoryService.releaseProduct(new InventoryAdjustmentRequestDto(
 				event.getDto().getProductId(),
 				event.getDto().getQuantity()));
+	}
+	
+	@KafkaListener(topics = "cart-confirm-events", groupId = "cart-group", containerFactory = "kafkaListenerContainerFactory")
+	public void consumerInventoryConfirmEvent(ConsumerRecord<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+		
+		CartEvent event = (CartEvent) convertToEvent(record.value().toString(), topic);
+		
+		
+		String response = inventoryService.confirmProductSale(new InventoryAdjustmentRequestDto(
+				event.getDto().getProductId(),
+				event.getDto().getQuantity()));
+		
+		logger.info(response);
 	}
 	
 	/********** Helper methods  **********/
